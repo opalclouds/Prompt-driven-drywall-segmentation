@@ -3,7 +3,7 @@
 <img src="https://img.shields.io/badge/Vision--Language-CLIPSeg-blueviolet?style=for-the-badge&logo=pytorch" />
 <img src="https://img.shields.io/badge/Task-Image%20Segmentation-blue?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Domain-Construction%20AI-orange?style=for-the-badge" />
-
+<img src="https://img.shields.io/badge/Model-Fine--Tuned-red?style=for-the-badge" />
 
 # 🧱 Prompt-Driven Drywall Defect Segmentation
 
@@ -19,9 +19,9 @@ One model. Any defect. Zero retraining.
 
 ## ✨ What Is This?
 
-Traditional defect detection pipelines require training a **separate model for each defect class** — cracks, joints, holes, and so on. That's slow, expensive, and rigid.
+Traditional defect detection pipelines require training a **separate model for each defect class** : cracks, joints, holes, and so on. That's slow, expensive, and rigid.
 
-This project flips that paradigm. By fine-tuning **CLIPSeg** — a vision-language segmentation model — on drywall imagery, we enable **natural language prompts to control what gets segmented**. Want to look for cracks? Type it. Joints? Type that instead. The same model handles both.
+This project flips that paradigm. By fine-tuning **CLIPSeg**, a vision-language segmentation model on drywall imagery, we enable **natural language prompts to control what gets segmented**. Want to look for cracks? Type it. Joints? Type that instead. The same model handles both.
 
 This makes the system **flexible, scalable, and inspection-ready** for real-world construction workflows.
 
@@ -29,24 +29,44 @@ This makes the system **flexible, scalable, and inspection-ready** for real-worl
 
 ## 🎯 Results
 
-### 🔍 Crack Segmentation
+### 🔴 Crack Segmentation
 > Prompt: `"segment crack"`
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/cracks/sample_1.png" width="750" alt="Crack Segmentation Result"/>
-  <br/>
-  <sub><i>The model precisely isolates crack regions from complex drywall textures.</i></sub>
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_1.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_2.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_3.png" width="280"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_4.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_5.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/crack_sample_6.png" width="280"/></td>
+  </tr>
+</table>
+<sub><i>The model precisely isolates crack regions from complex drywall textures.</i></sub>
 </div>
 
-<br/>
+---
 
-### 🔍 Drywall Joint Segmentation
+### 🟡 Drywall Joint Segmentation
 > Prompt: `"segment drywall joint"`
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall/sample_1.png" width="750" alt="Drywall Joint Segmentation Result"/>
-  <br/>
-  <sub><i>Panel joints are accurately delineated even in areas with low visual contrast.</i></sub>
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_1.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_2.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_3.png" width="280"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_4.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_5.png" width="280"/></td>
+    <td><img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall_sample_6.png" width="280"/></td>
+  </tr>
+</table>
+<sub><i>Panel joints are accurately delineated even in areas with low visual contrast.</i></sub>
 </div>
 
 ---
@@ -68,21 +88,21 @@ This makes the system **flexible, scalable, and inspection-ready** for real-worl
 
 ## 🏗️ Architecture
 ```
-┌─────────────────────────────────────────────────┐
-│                    CLIPSeg                       │
-│                                                  │
-│   📷 Image ──► Vision Encoder ──►  ┐             │
-│                                    ├──► Decoder ──► 🎭 Mask │
-│   📝 Prompt ──► Text Encoder  ──►  ┘             │
-│                                                  │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│                      CLIPSeg                         │
+│                                                      │
+│   📷 Image  ──► Vision Encoder (frozen) ──►  ┐       │
+│                                               ├──► Decoder ──► 🎭 Mask
+│   📝 Prompt ──► Text Encoder  (frozen) ──►  ┘       │
+│                                                      │
+└─────────────────────────────────────────────────────┘
 ```
 
-| Component | Role |
-|---|---|
-| **Vision Encoder** (frozen) | Extracts rich spatial features from the input image |
-| **Text Encoder** (frozen) | Encodes the natural language prompt into a feature vector |
-| **Segmentation Decoder** (fine-tuned) | Fuses both modalities and outputs a pixel-wise binary mask |
+| Component | Status | Role |
+|---|:---:|---|
+| **Vision Encoder** | ❄️ Frozen | Extracts rich spatial features from the input image |
+| **Text Encoder** | ❄️ Frozen | Encodes the natural language prompt into a feature vector |
+| **Segmentation Decoder** | 🔥 Fine-tuned | Fuses both modalities → outputs a pixel-wise binary mask |
 
 **Training Details:**
 - Pretrained CLIP encoders are **frozen** to preserve rich vision-language representations
@@ -123,10 +143,15 @@ Prompt-driven-drywall-segmentation/
 │
 ├── 📓 Copy_of_Prompted_Segmentation.ipynb   # Full training & inference notebook
 ├── 📁 results/
-│   ├── cracks/
-│   │   └── sample_1.png                     # Crack segmentation output
-│   └── drywall/
-│       └── sample_1.png                     # Joint segmentation output
+│   ├── crack_sample_1.png
+│   ├── crack_sample_2.png
+│   ├── crack_sample_3.png
+│   ├── crack_sample_4.png
+│   ├── crack_sample_5.png
+│   ├── crack_sample_6.png
+│   ├── drywall_sample_1.png
+│   ├── drywall_sample_2.png
+│   └── ...
 └── 📄 README.md
 ```
 
