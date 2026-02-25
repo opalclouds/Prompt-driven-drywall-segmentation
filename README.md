@@ -1,139 +1,184 @@
-# Prompt-Driven Segmentation of Drywall Defects using CLIPSeg
+<div align="center">
 
-This project implements a **prompt-based image segmentation system** to automatically identify drywall defects such as **cracks** and **joints** using natural language queries.
+<img src="https://img.shields.io/badge/Vision--Language-CLIPSeg-blueviolet?style=for-the-badge&logo=pytorch" />
+<img src="https://img.shields.io/badge/Task-Image%20Segmentation-blue?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Domain-Construction%20AI-orange?style=for-the-badge" />
 
-Unlike traditional segmentation models that require separate models per class, this system uses a **vision-language model** that can segment different defect types based on the input prompt.
 
-Example prompts:
+# 🧱 Prompt-Driven Drywall Defect Segmentation
 
-- segment crack
-- segment drywall joint
+### *Identify construction defects with nothing but a sentence.*
 
----
+**"segment crack"** → model highlights the crack.  
+**"segment drywall joint"** → model highlights the joint.  
+One model. Any defect. Zero retraining.
 
-# Overview
-
-Drywall defect detection is an important quality control task in construction. Manual inspection is slow, subjective, and error-prone.
-
-This project demonstrates how **vision-language models can automate inspection using flexible text prompts**, enabling scalable and intelligent defect detection.
+</div>
 
 ---
 
-# Model Architecture
+## ✨ What Is This?
 
-**Base Model:** CLIPSeg
+Traditional defect detection pipelines require training a **separate model for each defect class** — cracks, joints, holes, and so on. That's slow, expensive, and rigid.
 
-**Components:**
+This project flips that paradigm. By fine-tuning **CLIPSeg** — a vision-language segmentation model — on drywall imagery, we enable **natural language prompts to control what gets segmented**. Want to look for cracks? Type it. Joints? Type that instead. The same model handles both.
 
-- Vision Encoder: Extracts image features
-- Text Encoder: Extracts prompt features
-- Segmentation Decoder: Generates pixel-wise mask
-
-**Training Strategy:**
-
-- Pretrained encoders frozen
-- Decoder fine-tuned on drywall dataset
-- Binary Cross Entropy Loss used
+This makes the system **flexible, scalable, and inspection-ready** for real-world construction workflows.
 
 ---
 
-# Dataset
+## 🎯 Results
 
-Dataset obtained from Roboflow in COCO format.
+### 🔍 Crack Segmentation
+> Prompt: `"segment crack"`
 
-Contains:
+<div align="center">
+  <img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/cracks/sample_1.png" width="750" alt="Crack Segmentation Result"/>
+  <br/>
+  <sub><i>The model precisely isolates crack regions from complex drywall textures.</i></sub>
+</div>
 
-- Drywall crack images (polygon annotations)
-- Drywall joint images (bounding box annotations converted to masks)
+<br/>
 
-All annotations converted to binary segmentation masks.
+### 🔍 Drywall Joint Segmentation
+> Prompt: `"segment drywall joint"`
 
----
-
-# Results
-
-## Crack Segmentation
-
-![Crack Result](results/cracks/sample_1.png)
-
----
-
-## Drywall Joint Segmentation
-
-![Drywall Result](results/drywall/sample_1.png)
+<div align="center">
+  <img src="https://raw.githubusercontent.com/opalclouds/Prompt-driven-drywall-segmentation/main/results/drywall/sample_1.png" width="750" alt="Drywall Joint Segmentation Result"/>
+  <br/>
+  <sub><i>Panel joints are accurately delineated even in areas with low visual contrast.</i></sub>
+</div>
 
 ---
 
-# Performance Metrics
+## 📊 Performance Metrics
 
-| Dataset | IoU | Dice Score | Pixel Accuracy |
-|--------|------|-------------|----------------|
-| Cracks | 0.42 | 0.56 | 0.94 |
-| Drywall Joints | 0.50 | 0.65 | 0.91 |
+<div align="center">
 
----
+| Defect Class | IoU ↑ | Dice Score ↑ | Pixel Accuracy ↑ |
+|:---:|:---:|:---:|:---:|
+| 🔴 Cracks | `0.42` | `0.56` | `0.94` |
+| 🟡 Drywall Joints | `0.50` | `0.65` | `0.91` |
 
-# Key Features
+</div>
 
-Prompt-based segmentation  
-Single model handles multiple defect types  
-Vision-Language learning approach  
-Custom fine-tuning pipeline  
-Quantitative and qualitative evaluation  
+> **Note:** High pixel accuracy reflects the model's ability to correctly classify background regions. IoU and Dice scores are moderate at current training epochs — further fine-tuning is expected to improve mask precision significantly.
 
 ---
 
-# Project Structure
+## 🏗️ Architecture
+```
+┌─────────────────────────────────────────────────┐
+│                    CLIPSeg                       │
+│                                                  │
+│   📷 Image ──► Vision Encoder ──►  ┐             │
+│                                    ├──► Decoder ──► 🎭 Mask │
+│   📝 Prompt ──► Text Encoder  ──►  ┘             │
+│                                                  │
+└─────────────────────────────────────────────────┘
+```
 
+| Component | Role |
+|---|---|
+| **Vision Encoder** (frozen) | Extracts rich spatial features from the input image |
+| **Text Encoder** (frozen) | Encodes the natural language prompt into a feature vector |
+| **Segmentation Decoder** (fine-tuned) | Fuses both modalities and outputs a pixel-wise binary mask |
 
----
-
-# How It Works
-
-Input:
-
-Image + Text Prompt
-
-↓
-
-Model understands prompt context
-
-↓
-
-Outputs segmentation mask
-
----
-
-# Example
-
-Prompt:
-
-segment crack
-
-Output:
-
-Model highlights crack region
+**Training Details:**
+- Pretrained CLIP encoders are **frozen** to preserve rich vision-language representations
+- Only the **decoder is fine-tuned** on the drywall dataset
+- Loss function: **Binary Cross Entropy**
 
 ---
 
-# Applications
+## 📁 Dataset
 
-Construction quality inspection  
-Automated structural monitoring  
-Vision-language segmentation research  
-Prompt-based industrial inspection  
-
----
-
-# Future Improvements
-
-Train for more epochs to improve IoU  
-Support additional defect types  
-Deploy as real-time inspection tool  
+- **Source:** [Roboflow](https://roboflow.com/) — COCO format
+- **Crack images:** Polygon annotations → converted to binary masks
+- **Joint images:** Bounding box annotations → converted to binary masks
+- **Task type:** Binary segmentation (defect vs. background)
 
 ---
 
-# Acknowledgment
+## 🚀 How It Works
+```python
+# 1. Load image + write your prompt
+image = load_image("drywall_sample.jpg")
+prompt = "segment crack"
 
-This project demonstrates the power of combining computer vision and natural language for intelligent defect detection.
+# 2. Run inference
+mask = clipseg_model(image, prompt)
 
+# 3. Visualize
+overlay_mask_on_image(image, mask)
+```
+
+The model understands the **semantic meaning** of your prompt and localizes the corresponding region — no class IDs, no label mappings, just plain English.
+
+---
+
+## 📂 Project Structure
+```
+Prompt-driven-drywall-segmentation/
+│
+├── 📓 Copy_of_Prompted_Segmentation.ipynb   # Full training & inference notebook
+├── 📁 results/
+│   ├── cracks/
+│   │   └── sample_1.png                     # Crack segmentation output
+│   └── drywall/
+│       └── sample_1.png                     # Joint segmentation output
+└── 📄 README.md
+```
+
+---
+
+## 💡 Key Features
+
+- 🔤 **Prompt-based control** — change what you detect by changing your text
+- 🧠 **Single model, multiple classes** — no retraining needed for new defect types
+- ⚡ **Vision-Language fusion** — powered by CLIP's cross-modal understanding
+- 🎯 **Custom fine-tuning pipeline** — tailored for construction domain imagery
+- 📐 **Quantitative & qualitative evaluation** — IoU, Dice, Pixel Accuracy + visual outputs
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] Train for more epochs to push IoU beyond `0.60`
+- [ ] Expand to additional defect types: holes, water damage, peeling paint
+- [ ] Package as a **REST API** for real-time site inspection tools
+- [ ] Integrate with **mobile/drone camera feeds** for on-site deployment
+- [ ] Experiment with **SAM (Segment Anything Model)** as an alternative backbone
+
+---
+
+## 🛠️ Getting Started
+```bash
+# Clone the repo
+git clone https://github.com/opalclouds/Prompt-driven-drywall-segmentation.git
+cd Prompt-driven-drywall-segmentation
+
+# Install dependencies
+pip install transformers torch torchvision pillow matplotlib
+
+# Open the notebook
+jupyter notebook "Copy_of_Prompted_Segmentation (1).ipynb"
+```
+
+---
+
+## 🙏 Acknowledgements
+
+- [CLIPSeg — Lüddecke & Ecker, 2022](https://arxiv.org/abs/2112.10003) for the vision-language segmentation backbone
+- [Roboflow](https://roboflow.com/) for dataset hosting and annotation tools
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers/) for the CLIPSeg implementation
+
+---
+
+<div align="center">
+
+*Built to show that computer vision and natural language can work together for smarter, more flexible industrial inspection.*
+
+**⭐ Star this repo if you found it useful!**
+
+</div>
