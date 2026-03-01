@@ -141,7 +141,7 @@ The model understands the **semantic meaning** of your prompt and localizes the 
 ```
 Prompt-driven-drywall-segmentation/
 │
-├── 📓 Copy_of_Prompted_Segmentation.ipynb   # Full training & inference notebook
+├── 📓 Prompted_Segmentation_clean.ipynb   # Full training & inference notebook
 ├── 📁 results/
 │   ├── crack_sample_1.png
 │   ├── crack_sample_2.png
